@@ -1,0 +1,39 @@
+# Multi-Stage build 
+# Build the application using jdk image
+FROM openjdk:8-jdk-alpine as build
+WORKDIR /workspace/app
+
+# Copy the maven file, pom file & source code
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY src src
+
+# Use maven script file to compile & create the jar file
+RUN ./mvnw install -DskipTests
+# Create a dependency directory inside the target directory
+RUN mkdir -p target/dependency
+# Move the jar files into target/dependency directory
+RUN mv target/*.jar* target/dependency
+# Unpack the fat JAR. Create the application classes & the dependency jars
+RUN (cd target/dependency; jar -xf *.jar)
+
+# Create the run time image
+FROM openjdk:8-jre-alpine
+
+VOLUME /tmp
+
+# Run the application as a non-root user
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+
+# Copy all the dependecies & class file into directories from the build image 
+ARG DEPENDENCY=/workspace/app/target/dependency
+COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
+COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
+
+EXPOSE 8080
+
+# Specify the dependencies while running the jar
+ENTRYPOINT ["java","-cp","app:app/lib/*","com.azure.springbootsessionazureredis.DemoApplication"]

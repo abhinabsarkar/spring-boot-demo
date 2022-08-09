@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-session-azure-redis-app
+  # labels so that we can bind a Service to this Pod
+  labels:
+    app: spring-boot-session-azure-redis-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: spring-boot-session-azure-redis-app
+  template:
+    metadata:
+      labels:
+        app: spring-boot-session-azure-redis-app
+    spec:
+      containers:
+      - name: spring-boot-session-azure-redis-app
+        image: abhinabsarkar/spring-boot-session-azure-redis:v1.1.0
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "500m" #half the CPU free: 0.5 Core
+            memory: "256Mi"
+          limits:
+            cpu: "1000m" #max 1.0 Core
+            memory: "512Mi"
+        env:
+          - name: SPRING_REDIS_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: spring-boot-session-azure-redis-app
+                key: spring.redis.host
+          - name: SPRING_REDIS_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: spring-boot-session-azure-redis-app
+                key: spring.redis.port
+          - name: SPRING_REDIS_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: spring-boot-session-azure-redis-app
+                key: spring.redis.password                
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
