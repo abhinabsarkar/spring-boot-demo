@@ -8,7 +8,7 @@ Declaring a service of type LoadBalancer exposes it externally using a cloud pro
 
 > Nodeport shown in the diagram is for reference. It can be different.
 
-This is the default method for many Kubernetes installations in the cloud, but it uses an IP for every service, and that IP is configured to have its own load balancer configured in the cloud. These add costs and overhead that is overkill for essentially every cluster with multiple services.
+This is the default method for many Kubernetes installations in the cloud, **<ins>but it uses a Public IP for every service</ins>**, and that IP is configured to have its own load balancer configured in the cloud. These add costs and overhead that is overkill for essentially every cluster with multiple services.
 
 > Because of the above mentioned drawbacks, it is best to use `Ingress Controller` in production.
 
