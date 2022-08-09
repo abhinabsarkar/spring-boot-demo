@@ -1,5 +1,7 @@
 # Running stateful Spring Boot App on AKS
 
+The spring boot application is based on this [sample app](https://www.javainuse.com/spring/springboot_session_redis).
+
 ![alt txt](/images/aks-stateless-springboot-app.jpg)
 
 Declaring a service of type LoadBalancer exposes it externally using a cloud provider’s load balancer. The cloud provider will provision a load balancer for the Service, and map it to its automatically assigned NodePort. How the traffic from that external load balancer is routed to the Service pods depends on the cluster provider.
